@@ -22,6 +22,7 @@ package sqlite3
 #cgo CFLAGS: -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1
 #cgo CFLAGS: -DSQLITE_ENABLE_UPDATE_DELETE_LIMIT
 #cgo CFLAGS: -Wno-deprecated-declarations
+#cgo CFLAGS: -Wno-return-local-addr
 #cgo linux,!android CFLAGS: -DHAVE_PREAD64=1 -DHAVE_PWRITE64=1
 #ifndef USE_LIBSQLITE3
 #include <sqlite3-binding.h>
@@ -804,7 +805,7 @@ func (c *SQLiteConn) exec(ctx context.Context, query string, args []namedValue) 
 		if s.(*SQLiteStmt).s != nil {
 			stmtArgs := make([]namedValue, 0, len(args))
 			na := s.NumInput()
-			if len(args) - start < na {
+			if len(args)-start < na {
 				s.Close()
 				return nil, fmt.Errorf("not enough args to execute query: want %d got %d", na, len(args))
 			}
@@ -864,8 +865,8 @@ func (c *SQLiteConn) query(ctx context.Context, query string, args []namedValue)
 		}
 		s.(*SQLiteStmt).cls = true
 		na := s.NumInput()
-		if len(args) - start < na {
-			return nil, fmt.Errorf("not enough args to execute query: want %d got %d", na, len(args) - start)
+		if len(args)-start < na {
+			return nil, fmt.Errorf("not enough args to execute query: want %d got %d", na, len(args)-start)
 		}
 		// consume the number of arguments used in the current
 		// statement and append all named arguments not contained
